@@ -1,0 +1,110 @@
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
+import { Status } from "../globals/types/authType"
+import axios from "axios"
+
+interface ILoginUser{
+    email : string | null,
+    password : string | null
+}
+
+interface IUser extends ILoginUser{
+    username?: string | null,
+    confirmPassword ?: string | null
+    token ?: string | null
+}
+interface IAuthState{
+    user : IUser,
+    status : Status | null,
+    error : string | null
+}
+
+const initialState:IAuthState = {
+    user : {
+        username : null,
+        password : null,
+        confirmPassword : null,
+        email : null,
+        token : null
+
+    },
+    status : null,
+    error : null
+}
+
+
+export const registerUser = createAsyncThunk<IUser,IUser,{rejectValue : string}>(
+    "auth/registerData",
+    async (data,thunkAPI)=>{
+        try {
+            console.log('sending',data)
+            const response = await axios.post('http://localhost:3000/api/auth/register',data)
+            console.log("Server response:", response.data);
+            return response.data
+        } catch (error:any) {
+            console.error("Error from server:", error.response?.data?.message || error.message)
+            return thunkAPI.rejectWithValue(error.response?.data?.message)
+            
+        }
+    }
+)
+
+export const loginUser = createAsyncThunk<{token : string, user : {username: string, email: string, password: string}},ILoginUser,{rejectValue : string}>(
+    "auth/loginUser",
+    async (data,thunkAPI)=>{
+        try {
+            console.log('sending',data)
+            const response = await axios.post('http://localhost:3000/api/auth/login',data)
+            console.log("Server response:", response.data);
+            return {token : response.data.token , user : response.data.user}
+        } catch (error:any) {
+            console.error("Error from server:", error.response?.data?.message || error.message)
+            return thunkAPI.rejectWithValue(error.response?.data?.message)
+            
+        }
+    }
+)
+
+const authSlice = createSlice({
+    name : 'auth',
+    initialState,
+    reducers : {
+        setLogout: (state) =>{
+            state.user = initialState.user; // Reset user state
+            state.status = null;
+            state.error = null;
+        }
+        },
+    extraReducers(builder) {
+        builder.addCase(registerUser.pending, (state) =>{
+            state.status = Status.Loading
+        })
+        .addCase(registerUser.fulfilled, (state,action)=>{
+            state.status = Status.Success,
+            state.user = action.payload
+        })
+        .addCase(registerUser.rejected, (state,action)=>{
+            state.status = Status.Error,
+            state.error = action.payload || "Error"
+        })
+
+        builder.addCase(loginUser.pending, (state) =>{
+            state.status = Status.Loading
+        })
+        .addCase(loginUser.fulfilled, (state,action)=>{
+            state.status = Status.Success
+            state.user.token = action.payload.token
+            state.user.username = action.payload.user.username
+            state.user.email = action.payload.user.email
+            state.user.password = action.payload.user.password
+
+            localStorage.setItem("userToken",action.payload.token)
+        })
+        .addCase(loginUser.rejected, (state,action)=>{
+            state.status = Status.Error,
+            state.error = action.payload || "Error"
+        })
+    }
+})
+
+export const { setLogout }  = authSlice.actions
+export default authSlice.reducer
