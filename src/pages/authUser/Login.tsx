@@ -1,7 +1,7 @@
 import { ChangeEvent,FormEvent,useEffect,useState } from "react"
-import { Status } from "../globals/types/authType"
-import { useAppDispatch, useAppSelector } from "../store/hook"
-import {loginUser} from "../store/auth"
+import { Status } from "../../globals/types/authType"
+import { useAppDispatch, useAppSelector } from "../../store/hook"
+import {loginUser} from "../../store/authSlice"
 import { Link, useNavigate } from "react-router-dom"
 
 const Login = () => {
