@@ -55,7 +55,7 @@ const productSlice = createSlice({
             state.status = Status.Error
             state.error = action.payload || "Error"
         })
-        builder.addCase(fetchSingleProduct.pending,(state)=>{
+        .addCase(fetchSingleProduct.pending,(state)=>{
             state.status = Status.Loading
         })
         .addCase(fetchSingleProduct.fulfilled,(state,action)=>{

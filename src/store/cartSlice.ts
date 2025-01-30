@@ -3,17 +3,17 @@ import axios from "axios";
 import { Status } from "../globals/types/authType";
 
 interface ICartProduct {
-  id: string | null;
-  productName: string;
-  productPrice: number | null;
-  productImageUrl: string | null;
+  id: string 
+  productName: string
+  productPrice: number
+  productImageUrl: string 
 }
 
 interface ICartItems {
-  id: string | null;
-  quantity: number | null;
-  userId: string | null;
-  productId: string | null;
+  id: string 
+  quantity: number 
+  userId: string 
+  productId: string 
   product: ICartProduct;
 }
 
@@ -27,22 +27,6 @@ const initialState: ICartState = {
   cartItems: [],
   status: null,
   error: null,
-  // [
-  //     {
-  //         "id": "6d838f03-2949-42ac-a208-0da51fb45f86",
-  //         "quantity": 1,
-  //         "userId": "2f75e244-2dff-493d-9394-e03077eefb0d",
-  //         "productId": "83101597-74bc-4958-95c1-1c44acf6bac0",
-  //         "createdAt": "2025-01-30T11:20:47.126Z",
-  //         "updatedAt": "2025-01-30T11:20:47.126Z",
-  //         "product": {
-  //             "id": "83101597-74bc-4958-95c1-1c44acf6bac0",
-  //             "productName": "Iphone5",
-  //             "productPrice": 1300,
-  //             "productImageUrl": "1738147589332-images.jpeg"
-  //         }
-  //     }
-  // ]
 };
 
 export const createCart = createAsyncThunk<
@@ -67,6 +51,51 @@ export const createCart = createAsyncThunk<
   }
 });
 
+export const updateCart = createAsyncThunk<
+{productId:string,quantity:number},
+  {productId:string,quantity:number},
+  { rejectValue: string }>(
+    "cart/updateCart", 
+    async ({productId,quantity}, thunkAPI) => {
+  try {
+     await axios.patch(
+      `http://localhost:3000/api/cart/${productId}`,
+      {
+        quantity
+      },
+      {
+        headers: {
+          Authorization: localStorage.getItem("userToken"),
+        },
+      }
+    );
+    return {productId,quantity}
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.response.data.message);
+  }
+});
+
+export const deleteCart = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }>(
+    "cart/deleteCart", 
+    async (productId, thunkAPI) => {
+  try {
+     await axios.delete(
+      `http://localhost:3000/api/cart/${productId}`,
+      {
+        headers: {
+          Authorization: localStorage.getItem("userToken"),
+        },
+      }
+    );
+    return productId
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.response.data.message);
+  }
+});
+
 const cartSlice = createSlice({
   name: "cart",
   initialState,
@@ -80,6 +109,34 @@ const cartSlice = createSlice({
         (state.status = Status.Success), (state.cartItems = action.payload);
       })
       .addCase(createCart.rejected, (state, action) => {
+        (state.status = Status.Error),
+          (state.error = action.payload || "Error");
+      })
+      .addCase(updateCart.pending, (state) => {
+        state.status = Status.Loading;
+      })
+      .addCase(updateCart.fulfilled, (state, action) => {
+        (state.status = Status.Success) 
+        const index = state.cartItems.findIndex((c)=>c.product.id === action.payload.productId)
+        if(index !== -1){
+          state.cartItems[index].quantity = action.payload.quantity
+        }
+      })
+      .addCase(updateCart.rejected, (state, action) => {
+        (state.status = Status.Error),
+          (state.error = action.payload || "Error");
+      })
+      .addCase(deleteCart.pending, (state) => {
+        state.status = Status.Loading;
+      })
+      .addCase(deleteCart.fulfilled, (state, action) => {
+        (state.status = Status.Success) 
+        const index = state.cartItems.findIndex((c)=>c.product.id === action.payload)
+        if(index !== -1){
+          state.cartItems.splice(index,1)
+        }
+      })
+      .addCase(deleteCart.rejected, (state, action) => {
         (state.status = Status.Error),
           (state.error = action.payload || "Error");
       });
