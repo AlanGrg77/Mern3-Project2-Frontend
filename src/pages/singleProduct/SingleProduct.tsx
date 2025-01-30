@@ -4,18 +4,23 @@ import { useEffect } from "react";
 import { fetchSingleProduct, setProduct } from "../../store/productSlice";
 import { Status } from "../../globals/types/authType";
 import Navbar from "../../globals/components/Navbar";
+import { createCart } from "../../store/cartSlice";
 
 const SingleProduct = () => {
     const {id} = useParams()
     const dispatch = useAppDispatch()
     const {products, product, status} = useAppSelector((state)=>state.product)
     const productExists = products.find((p) => p.id === id)
+    
     if(products && productExists){
         dispatch(setProduct(productExists))
     }else{
         useEffect(()=>{
             id && dispatch(fetchSingleProduct(id))
         },[])
+    }
+    const handleAddCartButton = ()=> {
+      id && dispatch(createCart(id))
     }
 
     if(status === Status.Loading){
@@ -121,7 +126,7 @@ const SingleProduct = () => {
                 </div>
               </div>
               <div className="flex space-x-4 mb-6">
-                <button className="bg-indigo-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                <button onClick={handleAddCartButton} className="bg-indigo-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"

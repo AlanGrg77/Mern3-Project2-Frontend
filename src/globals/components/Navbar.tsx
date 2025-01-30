@@ -2,10 +2,12 @@ import { Link } from "react-router-dom"
 import { useAppDispatch, useAppSelector } from "../../store/hook"
 import { useEffect, useState } from "react"
 import { setLogout } from "../../store/authSlice"
+import { IoCartOutline } from "react-icons/io5";
 function Navbar(){
     const reduxToken = useAppSelector((store)=>store.auth.user.token)
     const localStorageToken = localStorage.getItem("userToken")
     const [isLoggedIn,setIsLoggedIn] = useState<boolean>(false)
+    const { cartItems } = useAppSelector((state)=>state.cart)
     const dispatch = useAppDispatch()
     useEffect(()=>{
         // setIsLoggedIn(!!localStorageToken || !!reduxToken)
@@ -47,10 +49,16 @@ function Navbar(){
       <div className="hidden md:block">
         {
             isLoggedIn ? (
+              <div className="flex gap-12 relative ">
+              <div className="hover:scale-105 cursor-pointer">
+                <IoCartOutline size={46}/>
+                <span className="absolute -top-[10px] left-9 bg-red-500 text-white text-xs font-bold h-5 w-5 flex items-center justify-center rounded-full">{cartItems.length > 0 ? cartItems.length : 0}</span>
+              </div>
                 <Link to='/'>
                 <button  type="button" onClick={handleLogout} className="mr-5 py-3 px-8 text-sm bg-teal-500 hover:bg-teal-600 rounded text-white ">Logout
                   </button>
                 </Link>
+              </div>
             )  : (
                 <>
                 <Link to='/register'>
