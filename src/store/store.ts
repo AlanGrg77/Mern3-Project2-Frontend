@@ -4,6 +4,7 @@ import exampleReducer from "./example"
 import authReducer from "./authSlice"
 import productReducer from "./productSlice"
 import cartReducer from "./cartSlice"
+import checkoutReducer from "./checkoutSlice";
 
 export const store = configureStore({
     reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
         example : exampleReducer,
         auth : authReducer,
         product : productReducer,
-        cart : cartReducer
+        cart : cartReducer,
+        checkout : checkoutReducer
     }
 })
 

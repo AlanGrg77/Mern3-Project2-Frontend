@@ -3,17 +3,18 @@ import { useAppDispatch, useAppSelector } from "../../store/hook"
 import { useEffect, useState } from "react"
 import { setLogout } from "../../store/authSlice"
 import { IoCartOutline } from "react-icons/io5";
+import { fetchCart} from "../../store/cartSlice";
 function Navbar(){
     const reduxToken = useAppSelector((store)=>store.auth.user.token)
     const localStorageToken = localStorage.getItem("userToken")
     const [isLoggedIn,setIsLoggedIn] = useState<boolean>(false)
     const { cartItems } = useAppSelector((state)=>state.cart)
     const dispatch = useAppDispatch()
-    console.log("hello",cartItems)
     useEffect(()=>{
         // setIsLoggedIn(!!localStorageToken || !!reduxToken)
         if(reduxToken && localStorageToken){
             setIsLoggedIn(true)
+            dispatch(fetchCart())
         }else{
           setIsLoggedIn(false)
         }

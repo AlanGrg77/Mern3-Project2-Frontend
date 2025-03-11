@@ -1,8 +1,8 @@
 
 import { useAppDispatch, useAppSelector } from "../../store/hook";
-import Navbar from "../../globals/components/Navbar";
 import { deleteCart, updateCart } from "../../store/cartSlice";
 import { IoTrashBinOutline } from "react-icons/io5";
+import { Link } from "react-router-dom";
 
 const Cart = () => {
   const {cartItems} = useAppSelector((state)=>state.cart)
@@ -19,7 +19,6 @@ const Cart = () => {
   const total = shippingCost + subTotal
   return (
     <>
-    <Navbar />
       <div className="bg-gray-100 h-screen py-8">
         <div className="container mx-auto px-4">
           <h1 className="text-2xl font-semibold mb-4">Shopping Cart</h1>
@@ -94,9 +93,11 @@ const Cart = () => {
                   <span className="font-semibold">Total</span>
                   <span className="font-semibold">Rs. {total}</span>
                 </div>
+                <Link to="/checkout">
                 <button className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-4 w-full">
                   Checkout
                 </button>
+                </Link>
                 
               </div>
             </div>

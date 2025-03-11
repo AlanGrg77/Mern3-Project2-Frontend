@@ -3,7 +3,6 @@ import { useAppDispatch, useAppSelector } from "../../store/hook";
 import { useEffect } from "react";
 import { fetchSingleProduct, setProduct } from "../../store/productSlice";
 import { Status } from "../../globals/types/authType";
-import Navbar from "../../globals/components/Navbar";
 import { createCart } from "../../store/cartSlice";
 
 const SingleProduct = () => {
@@ -32,7 +31,6 @@ const SingleProduct = () => {
   return (
     
     <>
-    <Navbar />
       {
         product && <div className="bg-gray-100">
         <div className="container mx-auto px-4 py-8">

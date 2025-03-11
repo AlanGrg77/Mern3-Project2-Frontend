@@ -5,7 +5,6 @@ function Home(){
     return (
 
 <div>
-<Navbar />
   <main className="text-gray-900">
     <section className="pt-20 md:pt-40">
       <div className="container mx-auto px-8 lg:flex">
@@ -634,7 +633,6 @@ function Home(){
     </div>
   </footer>
 </div>
-
     )
 }
 

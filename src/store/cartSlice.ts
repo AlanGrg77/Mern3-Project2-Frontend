@@ -51,6 +51,29 @@ export const createCart = createAsyncThunk<
   }
 });
 
+export const fetchCart = createAsyncThunk<
+  ICartItems[],
+  void,
+  { rejectValue: string }>(
+    "cart/fetchCart", 
+    async (_, thunkAPI) => {
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/api/cart",
+      {
+        headers: {
+          Authorization: localStorage.getItem("userToken"),
+        },
+      }
+    );
+    return response.data.data;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.response.data.message);
+  }
+});
+
+
+
 export const updateCart = createAsyncThunk<
 {productId:string,quantity:number},
   {productId:string,quantity:number},
@@ -106,7 +129,8 @@ const cartSlice = createSlice({
         state.status = Status.Loading;
       })
       .addCase(createCart.fulfilled, (state, action) => {
-        (state.status = Status.Success), (state.cartItems = action.payload);
+        (state.status = Status.Success), 
+        (state.cartItems = action.payload);
       })
       .addCase(createCart.rejected, (state, action) => {
         (state.status = Status.Error),
@@ -137,6 +161,16 @@ const cartSlice = createSlice({
         }
       })
       .addCase(deleteCart.rejected, (state, action) => {
+        (state.status = Status.Error),
+          (state.error = action.payload || "Error");
+      })
+      .addCase(fetchCart.pending, (state) => {
+        state.status = Status.Loading;
+      })
+      .addCase(fetchCart.fulfilled, (state, action) => {
+        state.cartItems = action.payload
+      })
+      .addCase(fetchCart.rejected, (state, action) => {
         (state.status = Status.Error),
           (state.error = action.payload || "Error");
       });
