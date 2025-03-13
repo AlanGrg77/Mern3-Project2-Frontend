@@ -44,9 +44,23 @@ interface IOrderData{
 //     ],
 //     "paymentMethod" : "cod"
 // }
+interface IformData {
+  amount: string,
+  failure_url: string,
+  product_delivery_charge: string,
+  product_service_charge: string,
+  product_code: string,
+  signature: string,
+  signed_field_names: string,
+  success_url: string,
+  tax_amount: string,
+  total_amount : string,
+  transaction_uuid: string
+}
 interface IinitialCState{
     checkoutItems : IOrderItems[],
     khaltiUrl : string | null,
+    esewaFormData : IformData | null,
     status : string | null,
     error : string | null
 }
@@ -59,13 +73,14 @@ export enum PaymentMethod{
 const initialState:IinitialCState ={
     checkoutItems : [],
     khaltiUrl : null,
+    esewaFormData : null,
     status : null,
     error : null
 }
 
 
 
-export const handleCheckout = createAsyncThunk<{data : IOrderItems[] , url? : string},IOrderData, { rejectValue: string }>(
+export const handleCheckout = createAsyncThunk<{data : IOrderItems[] , url? : string, esewaFormData? : IformData},IOrderData, { rejectValue: string }>(
     'checkout/handleCheckout',
     async (submitData,thunkAPI) =>{
         try{
@@ -79,7 +94,8 @@ export const handleCheckout = createAsyncThunk<{data : IOrderItems[] , url? : st
           );
           return {
             data : response.data.data,
-            url : response.data.url || undefined
+            url : response.data.url || undefined,
+            esewaFormData : response.data.EsewaformData || undefined
           };
         }catch (error: any) {
           return thunkAPI.rejectWithValue(error.response.data.message);
@@ -103,7 +119,8 @@ const checkoutSlice = createSlice({
               .addCase(handleCheckout.fulfilled, (state, action) => {
                 state.status = Status.Success, 
                 state.checkoutItems = action.payload.data,
-                state.khaltiUrl = action.payload.url || null;
+                state.khaltiUrl = action.payload.url || null,
+                state.esewaFormData = action.payload.esewaFormData || null
                 
               })
               .addCase(handleCheckout.rejected, (state, action:PayloadAction<string | undefined >) => {
