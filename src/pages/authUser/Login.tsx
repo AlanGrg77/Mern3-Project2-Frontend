@@ -1,7 +1,7 @@
 import { ChangeEvent,FormEvent,useEffect,useState } from "react"
 import { Status } from "../../globals/types/authType"
 import { useAppDispatch, useAppSelector } from "../../store/hook"
-import {loginUser} from "../../store/authSlice"
+import {loginUser, setStatus} from "../../store/authSlice"
 import { Link, useNavigate } from "react-router-dom"
 
 const Login = () => {
@@ -16,19 +16,27 @@ const Login = () => {
     })
 
     useEffect(()=>{
-        if(status === Status.Error){
-            console.log("Error in useEffect: ", error);
-            setShowError(true)
-            const timer = setTimeout(()=>{
-                setShowError(false)
-            },5000) 
-        return () => clearTimeout(timer)
+      let timer: ReturnType<typeof setTimeout>;
+      const handleEffect = async () => {
+        if (status === Status.Error) {
+          console.log("Error in useEffect: ", error);
+          setShowError(true);
+          timer = setTimeout(() => {
+            setShowError(false);
+          }, 5000);
+          
         }
-        if(status === Status.Success){
-          navigate("/")
-          return
+    
+        if (status === Status.Success) {
+          navigate("/");
         }
-    },[status])
+        handleEffect();
+           // Clear timeout when component unmounts or deps change
+        return () => clearTimeout(timer);
+    }},[status , error, navigate])
+    useEffect(() => {
+      dispatch(setStatus(null)); // reset status when login page loads
+    }, [dispatch]);
 
     const handleChange = (e:ChangeEvent<HTMLInputElement>) =>{
         const {name,value} = e.target

@@ -3,11 +3,17 @@ import axios from "axios";
 import { Status } from "../globals/types/authType";
 
 interface IProduct{
-    productId : string,
-    productQty : number, 
+  productId : string, 
+  productQty : number, 
+  orderStatus? : string, 
+  totalAmount?:number, 
+  Payment? : {
+      paymentMethod : PaymentMethod, 
+      
+  }
 }
 export interface IOrderItems extends IProduct{
-  orderId : string
+  id : string
 }
 
 interface IOrderData{
@@ -22,6 +28,50 @@ interface IOrderData{
     totalAmount : number,
     products : IProduct[],
     paymentMethod : PaymentMethod
+}
+export enum PaymentStatus{
+  Paid = "paid", 
+  Unpaid = "unpaid"
+}
+export enum OrderStatus{
+  Preparation = "preparation", 
+  Ontheway = "ontheway", 
+  Delivered = "delivered", 
+  Pending = "pending", 
+  Cancelled = "cancelled"
+}
+export interface IOrderDetail {
+  id: string,
+  quantity: number,
+  createdAt: string,
+
+  orderId: string,
+  productId: string,
+  order: {
+      orderStatus: OrderStatus,
+      addressLine: string,
+      city: string,
+      state: string,
+      totalAmount: number,
+      phoneNumber: string,
+      firstName : string, 
+      lastName : string, 
+      userId : string,
+      Payment: {
+          paymentMethod: PaymentMethod,
+          paymentStatus: PaymentStatus
+      }
+  },
+  product: {
+      productImageUrl: string,
+      productName: string,
+      productPrice: number,
+      Category: {
+
+          categoryName: string,
+
+      }
+  }
 }
 // "firstName" : "Alan9", 
 //     "lastName" : "Grg", 
@@ -58,7 +108,8 @@ interface IformData {
   transaction_uuid: string
 }
 interface IinitialCState{
-    checkoutItems : IOrderItems[],
+    items : IOrderItems[],
+    orderDetails : IOrderDetail[],
     khaltiUrl : string | null,
     esewaFormData : IformData | null,
     status : string | null,
@@ -71,7 +122,8 @@ export enum PaymentMethod{
 }
 
 const initialState:IinitialCState ={
-    checkoutItems : [],
+    items : [],
+    orderDetails : [],
     khaltiUrl : null,
     esewaFormData : null,
     status : null,
@@ -104,6 +156,45 @@ export const handleCheckout = createAsyncThunk<{data : IOrderItems[] , url? : st
     }
 )
 
+export const fetchMyOrder= createAsyncThunk<IOrderItems[],void, { rejectValue: string }>(
+  'checkout/fetchMyOrder',
+  async (_,thunkAPI) =>{
+      try{
+      const response = await axios.get(
+          "http://localhost:3000/api/order",
+          {
+            headers: {
+              Authorization: localStorage.getItem("userToken"),
+            },
+          }
+        );
+        return response.data.data
+      }catch (error: any) {
+        return thunkAPI.rejectWithValue(error.response.data.message);
+      }
+
+  }
+)
+export const fetchMyOrderDetails= createAsyncThunk<IOrderDetail[],string, { rejectValue: string }>(
+  'checkout/fetchMyOrderDetails',
+  async (id,thunkAPI) =>{
+      try{
+      const response = await axios.get(
+          "http://localhost:3000/api/order/"+id,
+          {
+            headers: {
+              Authorization: localStorage.getItem("userToken"),
+            },
+          }
+        );
+        return response.data.data
+      }catch (error: any) {
+        return thunkAPI.rejectWithValue(error.response.data.message);
+      }
+
+  }
+)
+
 
 
 const checkoutSlice = createSlice({
@@ -118,12 +209,36 @@ const checkoutSlice = createSlice({
               })
               .addCase(handleCheckout.fulfilled, (state, action) => {
                 state.status = Status.Success, 
-                state.checkoutItems = action.payload.data,
+                state.items = action.payload.data,
                 state.khaltiUrl = action.payload.url || null,
                 state.esewaFormData = action.payload.esewaFormData || null
                 
               })
               .addCase(handleCheckout.rejected, (state, action:PayloadAction<string | undefined >) => {
+                 state.status = Status.Error,
+                  state.error = action.payload || "Error"
+              })
+              .addCase(fetchMyOrder.pending, (state) => {
+                state.status = Status.Loading;
+                state.error = null;
+              })
+              .addCase(fetchMyOrder.fulfilled, (state, action) => {
+                state.status = Status.Success, 
+                state.items = action.payload
+              })
+              .addCase(fetchMyOrder.rejected, (state, action:PayloadAction<string | undefined >) => {
+                 state.status = Status.Error,
+                  state.error = action.payload || "Error"
+              })
+              .addCase(fetchMyOrderDetails.pending, (state) => {
+                state.status = Status.Loading;
+                state.error = null;
+              })
+              .addCase(fetchMyOrderDetails.fulfilled, (state, action) => {
+                state.status = Status.Success, 
+                state.orderDetails = action.payload
+              })
+              .addCase(fetchMyOrderDetails.rejected, (state, action:PayloadAction<string | undefined >) => {
                  state.status = Status.Error,
                   state.error = action.payload || "Error"
               })

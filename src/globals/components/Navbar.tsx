@@ -40,12 +40,11 @@ function Navbar(){
         </div></Link>HDokaan..
       </div>
       <div className="flex mt-4 sm:mt-0">
-        <a className="px-4" href="#features">Features</a>
-        <a className="px-4" href="#services">Services</a>
-        <a className="px-4" href="#stats">Stats</a>
         <Link to={'/products'}>
           <div className="px-4">Products</div>
         </Link>
+        <Link className="px-4" to="/my-orders">My Orders</Link>
+
       </div>
       
       <div className="hidden md:block">

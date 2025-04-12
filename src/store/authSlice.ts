@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { Status } from "../globals/types/authType"
 import axios from "axios"
 
@@ -72,6 +72,10 @@ const authSlice = createSlice({
             state.user = initialState.user; // Reset user state
             state.status = null;
             state.error = null;
+        },
+        setStatus: (state,action: PayloadAction<Status | null>) =>{
+            state.status = action.payload;
+            state.status = null
         }
         },
     extraReducers(builder) {
@@ -106,5 +110,5 @@ const authSlice = createSlice({
     }
 })
 
-export const { setLogout }  = authSlice.actions
+export const { setLogout , setStatus }  = authSlice.actions
 export default authSlice.reducer
