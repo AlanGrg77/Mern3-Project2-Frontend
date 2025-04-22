@@ -30,10 +30,11 @@ const Login = () => {
         if (status === Status.Success) {
           navigate("/");
         }
+      };
         handleEffect();
            // Clear timeout when component unmounts or deps change
         return () => clearTimeout(timer);
-    }},[status , error, navigate])
+    },[status , error, navigate])
     useEffect(() => {
       dispatch(setStatus(null)); // reset status when login page loads
     }, [dispatch]);

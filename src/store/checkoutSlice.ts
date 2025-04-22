@@ -13,7 +13,8 @@ interface IProduct{
   }
 }
 export interface IOrderItems extends IProduct{
-  id : string
+  id : string,
+  orderId : string
 }
 
 interface IOrderData{
@@ -112,7 +113,8 @@ interface IinitialCState{
     orderDetails : IOrderDetail[],
     khaltiUrl : string | null,
     esewaFormData : IformData | null,
-    status : string | null,
+    fetchStatus: null | 'loading' | 'success' | 'error',
+    checkoutStatus: null | 'loading' | 'success' | 'error',
     error : string | null
 }
 export enum PaymentMethod{
@@ -126,7 +128,8 @@ const initialState:IinitialCState ={
     orderDetails : [],
     khaltiUrl : null,
     esewaFormData : null,
-    status : null,
+    fetchStatus: null,
+    checkoutStatus: null,
     error : null
 }
 
@@ -140,7 +143,7 @@ export const handleCheckout = createAsyncThunk<{data : IOrderItems[] , url? : st
             "http://localhost:3000/api/order", submitData,
             {
               headers: {
-                Authorization: localStorage.getItem("userToken"),
+                Authorization: `Bearer ${localStorage.getItem("userToken")}`,
               },
             }
           );
@@ -164,7 +167,7 @@ export const fetchMyOrder= createAsyncThunk<IOrderItems[],void, { rejectValue: s
           "http://localhost:3000/api/order",
           {
             headers: {
-              Authorization: localStorage.getItem("userToken"),
+              Authorization: `Bearer ${localStorage.getItem("userToken")}`,
             },
           }
         );
@@ -183,13 +186,35 @@ export const fetchMyOrderDetails= createAsyncThunk<IOrderDetail[],string, { reje
           "http://localhost:3000/api/order/"+id,
           {
             headers: {
-              Authorization: localStorage.getItem("userToken"),
+              Authorization: `Bearer ${localStorage.getItem("userToken")}`,
             },
           }
         );
         return response.data.data
       }catch (error: any) {
         return thunkAPI.rejectWithValue(error.response.data.message);
+      }
+
+  }
+)
+
+export const cancelOrderAPI= createAsyncThunk<string,string, { rejectValue: string }>(
+  'checkout/cancelOrderAPI',
+  async (id,thunkAPI) =>{
+      try{
+      await axios.patch(
+          "http://localhost:3000/api/order/cancel-order/"+id,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+            },
+          }
+        );
+        return id
+        
+      }catch (error: any) {
+        return thunkAPI.rejectWithValue(error.message);
       }
 
   }
@@ -204,44 +229,50 @@ const checkoutSlice = createSlice({
     extraReducers(builder) {
         builder
         .addCase(handleCheckout.pending, (state) => {
-                state.status = Status.Loading;
+                state.checkoutStatus = Status.Loading;
                 state.error = null;
               })
               .addCase(handleCheckout.fulfilled, (state, action) => {
-                state.status = Status.Success, 
+                state.checkoutStatus = Status.Success, 
                 state.items = action.payload.data,
                 state.khaltiUrl = action.payload.url || null,
                 state.esewaFormData = action.payload.esewaFormData || null
                 
               })
               .addCase(handleCheckout.rejected, (state, action:PayloadAction<string | undefined >) => {
-                 state.status = Status.Error,
+                 state.checkoutStatus = Status.Error,
                   state.error = action.payload || "Error"
               })
               .addCase(fetchMyOrder.pending, (state) => {
-                state.status = Status.Loading;
+                state.fetchStatus = Status.Loading;
                 state.error = null;
               })
               .addCase(fetchMyOrder.fulfilled, (state, action) => {
-                state.status = Status.Success, 
+                state.fetchStatus = Status.Success, 
                 state.items = action.payload
               })
               .addCase(fetchMyOrder.rejected, (state, action:PayloadAction<string | undefined >) => {
-                 state.status = Status.Error,
+                 state.fetchStatus = Status.Error,
                   state.error = action.payload || "Error"
               })
               .addCase(fetchMyOrderDetails.pending, (state) => {
-                state.status = Status.Loading;
+                state.fetchStatus = Status.Loading;
                 state.error = null;
               })
               .addCase(fetchMyOrderDetails.fulfilled, (state, action) => {
-                state.status = Status.Success, 
+                state.fetchStatus = Status.Success, 
                 state.orderDetails = action.payload
               })
               .addCase(fetchMyOrderDetails.rejected, (state, action:PayloadAction<string | undefined >) => {
-                 state.status = Status.Error,
+                 state.fetchStatus = Status.Error,
                   state.error = action.payload || "Error"
               })
+              .addCase(cancelOrderAPI.fulfilled, (state, action) => {
+                const orderId = action.payload;
+                const datas = state.orderDetails.find((order)=>order.orderId === orderId)
+                datas ? datas.order.orderStatus = OrderStatus.Cancelled : ""
+
+             })
     },
 })
 

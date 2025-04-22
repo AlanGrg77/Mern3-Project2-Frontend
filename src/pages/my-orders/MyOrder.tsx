@@ -53,7 +53,7 @@ function MyOrder(){
             return ( 
                 <tr className="hover:bg-slate-50">
                 <td className="p-4 border-b border-slate-200 py-5">
-             <Link to={`/my-orders/${item.id}`}>
+             <Link key={item.id} to={`/my-orders/${item.id}`}>
              <p className="block font-semibold text-sm text-slate-800">{item.id}</p>
              </Link>
                  

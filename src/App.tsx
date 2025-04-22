@@ -19,16 +19,16 @@ function App() {
       <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-        <Route path="/example" element={<Example/>}/>
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/products/:id" element={<SingleProduct />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/my-orders" element={<MyOrder />} />
-        <Route path="/my-orders/:id" element={<MyOrderDetail />} />
+          <Route path="example" element={<Example/>}/>
+          <Route path="products" element={<Products />} />
+          <Route path="products/:id" element={<SingleProduct />} />
+          <Route path="cart" element={<Cart />} />
+          <Route path="checkout" element={<Checkout />} />
+          <Route path="my-orders" element={<MyOrder />} />
+          <Route path="my-orders/:id" element={<MyOrderDetail />} />
         </Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
       </BrowserRouter>
     </>

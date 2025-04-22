@@ -12,7 +12,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { cartItems } = useAppSelector((state) => state.cart);
   const dispatch = useAppDispatch();
-  const { khaltiUrl, error, status, esewaFormData } = useAppSelector(
+  const { khaltiUrl, error, checkoutStatus, esewaFormData } = useAppSelector(
     (state) => state.checkout
   );
   const subTotal = cartItems.reduce(
@@ -62,7 +62,7 @@ const Checkout = () => {
       document.body.appendChild(form);
       form.submit(); // Auto-submit the form
     }
-    if (status === Status.Error) {
+    if (checkoutStatus=== Status.Error) {
       console.log("Error in useEffect: ", error);
       setShowError(true);
       const timer = setTimeout(() => {
@@ -70,11 +70,11 @@ const Checkout = () => {
       }, 5000);
       return () => clearTimeout(timer);
     }
-    if (status === Status.Success) {
+    if (checkoutStatus=== Status.Success) {
       navigate("/");
       return;
     }
-  }, [khaltiUrl, esewaFormData, status]);
+  }, [khaltiUrl, esewaFormData, checkoutStatus]);
   
   const handlePayment = (method: PaymentMethod) => {
     setPaymentMethodValue(method);

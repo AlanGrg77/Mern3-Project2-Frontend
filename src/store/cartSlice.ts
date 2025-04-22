@@ -41,7 +41,7 @@ export const createCart = createAsyncThunk<
       { productId: id, quantity: 1 },
       {
         headers: {
-          Authorization: localStorage.getItem("userToken"),
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
         },
       }
     );
@@ -62,7 +62,7 @@ export const fetchCart = createAsyncThunk<
       "http://localhost:3000/api/cart",
       {
         headers: {
-          Authorization: localStorage.getItem("userToken"),
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
         },
       }
     );
@@ -88,7 +88,7 @@ export const updateCart = createAsyncThunk<
       },
       {
         headers: {
-          Authorization: localStorage.getItem("userToken"),
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
         },
       }
     );
@@ -109,7 +109,7 @@ export const deleteCart = createAsyncThunk<
       `http://localhost:3000/api/cart/${productId}`,
       {
         headers: {
-          Authorization: localStorage.getItem("userToken"),
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
         },
       }
     );
