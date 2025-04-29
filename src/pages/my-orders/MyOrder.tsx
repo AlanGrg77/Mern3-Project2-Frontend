@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
-import Navbar from "../../globals/components/Navbar"
 import { Link } from "react-router-dom"
-import { fetchMyOrder } from "../../store/checkoutSlice"
+import { fetchMyOrder, resetFetchStatus } from "../../store/checkoutSlice"
 import { useAppDispatch, useAppSelector } from "../../store/hook"
 
 
@@ -11,7 +10,7 @@ function MyOrder(){
     const [searchTerm,setSearchTerm] = useState<string>("")
     console.log(searchTerm)
 
-    const newItems = items.filter((item)=>item.id.toLowerCase().includes(searchTerm) || item.orderStatus?.toLowerCase().includes(searchTerm) || item.Payment?.paymentMethod.toLowerCase().includes(searchTerm) || item.totalAmount == parseInt(searchTerm))
+    const newItems = items.filter((item)=>item.id.toLowerCase().includes(searchTerm) || item.orderStatus?.toLowerCase().includes(searchTerm) || item.payment?.paymentMethod.toLowerCase().includes(searchTerm) || item.totalAmount == parseInt(searchTerm))
     console.log(newItems)
     useEffect(()=>{
         dispatch(fetchMyOrder())
@@ -65,7 +64,7 @@ function MyOrder(){
                   <p className="text-sm text-slate-500">{item.totalAmount}</p>
                 </td>
                 <td className="p-4 border-b border-slate-200 py-5">
-                  <p className="text-sm text-slate-500">{item.Payment?.paymentMethod}</p>
+                  <p className="text-sm text-slate-500">{item.payment?.paymentMethod}</p>
                 </td>
      
                

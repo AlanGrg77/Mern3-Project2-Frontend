@@ -7,7 +7,7 @@ interface IProduct{
   productQty : number, 
   orderStatus? : string, 
   totalAmount?:number, 
-  Payment? : {
+  payment? : {
       paymentMethod : PaymentMethod, 
       
   }
@@ -225,7 +225,14 @@ export const cancelOrderAPI= createAsyncThunk<string,string, { rejectValue: stri
 const checkoutSlice = createSlice({
     name : "checkout",
     initialState,
-    reducers : {},
+    reducers : {
+      resetCheckoutStatus(state){
+        state.checkoutStatus = null
+    },
+    resetFetchStatus(state){
+      state.fetchStatus = null
+  }
+    },
     extraReducers(builder) {
         builder
         .addCase(handleCheckout.pending, (state) => {
@@ -276,4 +283,5 @@ const checkoutSlice = createSlice({
     },
 })
 
+export const {resetFetchStatus,resetCheckoutStatus} = checkoutSlice.actions
 export default checkoutSlice.reducer

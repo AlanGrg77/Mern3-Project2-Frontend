@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { useAppDispatch, useAppSelector } from "../../store/hook";
 import { Link, useNavigate } from "react-router-dom";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { handleCheckout, PaymentMethod } from "../../store/checkoutSlice";
+import { handleCheckout, PaymentMethod, resetCheckoutStatus } from "../../store/checkoutSlice";
 import Khalti from "../../img/khalti.png";
 import Esewa from "../../img/esewa.png";
 import { Status } from "../../globals/types/authType";
@@ -72,6 +72,7 @@ const Checkout = () => {
     }
     if (checkoutStatus=== Status.Success) {
       navigate("/");
+      dispatch(resetCheckoutStatus())
       return;
     }
   }, [khaltiUrl, esewaFormData, checkoutStatus]);
