@@ -37,7 +37,7 @@ function Navbar(){
             <path  fill="#3182CE" d="M36,22l-1-6l-18,7l17,7l-2-5l-8-2h12V22z M27.661,21l5.771-2.244L33.806,21H27.661z">
             </path>
           </svg>
-        </div></Link>HDokaan..
+        </div></Link>Hamro Dokaan..
       </div>
       <div className="flex mt-4 sm:mt-0">
         <Link to={'/products'}>

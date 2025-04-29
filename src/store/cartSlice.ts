@@ -58,7 +58,7 @@ export const fetchCart = createAsyncThunk<
     "cart/fetchCart", 
     async (_, thunkAPI) => {
   try {
-    const response = await axios.post(
+    const response = await axios.get(
       "http://localhost:3000/api/cart",
       {
         headers: {

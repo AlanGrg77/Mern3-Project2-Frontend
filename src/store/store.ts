@@ -4,7 +4,8 @@ import exampleReducer from "./example"
 import authReducer from "./authSlice"
 import productReducer from "./productSlice"
 import cartReducer from "./cartSlice"
-import checkoutReducer from "./checkoutSlice";
+import checkoutReducer from "./checkoutSlice"
+import categoryReducer from "./adminCategorySlice."
 
 export const store = configureStore({
     reducer: {
@@ -13,7 +14,8 @@ export const store = configureStore({
         auth : authReducer,
         product : productReducer,
         cart : cartReducer,
-        checkout : checkoutReducer
+        checkout : checkoutReducer,
+        category : categoryReducer
     }
 })
 

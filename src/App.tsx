@@ -9,6 +9,9 @@ import Checkout from "./pages/checkout/Checkout"
 import Layout from "./pages/layout/Layout"
 import MyOrder from "./pages/my-orders/MyOrder"
 import MyOrderDetail from "./pages/my-orders-details/MyOrderDetail"
+import AdminLayout from "./pages/admin/AdminLayout"
+import Categories from "./pages/admin/categories/Categories"
+import AdminStats from "./pages/admin/stats/AdminStats"
 
 
 
@@ -29,6 +32,9 @@ function App() {
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path='/admin' element={<AdminStats/>} />
+        <Route path='/admin/categories' element={<Categories />} />
+        <Route path='/admin/stats' element={<AdminStats />} />
       </Routes>
       </BrowserRouter>
     </>
