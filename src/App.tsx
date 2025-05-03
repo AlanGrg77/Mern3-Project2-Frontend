@@ -1,5 +1,4 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
-import Example from "./pages/Example"
 import Register from "./pages/authUser/Register"
 import Login from "./pages/authUser/Login"
 import Products from "./pages/product/Products"
@@ -9,9 +8,10 @@ import Checkout from "./pages/checkout/Checkout"
 import Layout from "./pages/layout/Layout"
 import MyOrder from "./pages/my-orders/MyOrder"
 import MyOrderDetail from "./pages/my-orders-details/MyOrderDetail"
-import AdminLayout from "./pages/admin/AdminLayout"
 import Categories from "./pages/admin/categories/Categories"
 import AdminStats from "./pages/admin/stats/AdminStats"
+import Users from "./pages/admin/users/Users"
+import AdminProduct from "./pages/admin/product/Product"
 
 
 
@@ -22,7 +22,6 @@ function App() {
       <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route path="example" element={<Example/>}/>
           <Route path="products" element={<Products />} />
           <Route path="products/:id" element={<SingleProduct />} />
           <Route path="cart" element={<Cart />} />
@@ -35,6 +34,8 @@ function App() {
         <Route path='/admin' element={<AdminStats/>} />
         <Route path='/admin/categories' element={<Categories />} />
         <Route path='/admin/stats' element={<AdminStats />} />
+        <Route path='/admin/users' element={<Users />} />
+        <Route path='/admin/products' element={<AdminProduct />} />
       </Routes>
       </BrowserRouter>
     </>
