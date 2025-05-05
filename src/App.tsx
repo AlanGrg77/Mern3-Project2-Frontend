@@ -12,6 +12,16 @@ import Categories from "./pages/admin/categories/Categories"
 import AdminStats from "./pages/admin/stats/AdminStats"
 import Users from "./pages/admin/users/Users"
 import AdminProduct from "./pages/admin/product/Product"
+import AdminOrder from "./pages/admin/orders/AdminOrder"
+import AdminOrderDetails from "./pages/admin/order-details/AdminOrderDetails"
+import { io } from 'socket.io-client'
+import AdminRoute from "./globals/components/AdminRouteProcted"
+export const socket = io("http://localhost:3000",{
+  auth : {
+    token  : localStorage.getItem("userToken")
+  }
+})
+
 
 
 
@@ -31,11 +41,14 @@ function App() {
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path='/admin' element={<AdminStats/>} />
-        <Route path='/admin/categories' element={<Categories />} />
-        <Route path='/admin/stats' element={<AdminStats />} />
-        <Route path='/admin/users' element={<Users />} />
-        <Route path='/admin/products' element={<AdminProduct />} />
+
+        <Route path="/admin" element={<AdminRoute><AdminStats /></AdminRoute>} />
+        <Route path="/admin/categories" element={<AdminRoute><Categories /></AdminRoute>} />
+        <Route path="/admin/stats" element={<AdminRoute><AdminStats /></AdminRoute>} />
+        <Route path="/admin/users" element={<AdminRoute><Users /></AdminRoute>} />
+        <Route path="/admin/products" element={<AdminRoute><AdminProduct /></AdminRoute>} />
+        <Route path="/admin/orders" element={<AdminRoute><AdminOrder /></AdminRoute>} />
+        <Route path="/admin/orders/:id" element={<AdminRoute><AdminOrderDetails /></AdminRoute>} />
       </Routes>
       </BrowserRouter>
     </>

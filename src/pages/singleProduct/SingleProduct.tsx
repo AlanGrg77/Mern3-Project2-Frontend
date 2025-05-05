@@ -5,11 +5,18 @@ import { fetchSingleProduct, setProduct } from "../../store/productSlice";
 import { Status } from "../../globals/types/authType";
 import { createCart } from "../../store/cartSlice";
 
+import { useState } from "react";
+import { submitReview } from "../../store/productSlice"; // Create this action to handle the review submission
+
+
 const SingleProduct = () => {
     const {id} = useParams()
     const dispatch = useAppDispatch()
     const {products, product, status} = useAppSelector((state)=>state.product)
+    const {user} = useAppSelector((state)=>state.auth)
     const productExists = products.find((p) => p.id === id)
+    const [rating, setRating] = useState<number>(0); // Rating from 1 to 5
+    const [comment, setComment] = useState<string>("");
     
     if(products && productExists){
         dispatch(setProduct(productExists))
@@ -22,12 +29,35 @@ const SingleProduct = () => {
       id && dispatch(createCart(id))
     }
 
-    if(status === Status.Loading){
-          return <div className="flex justify-center items-center h-screen">
-          <img src="/fade-stagger-circles.svg" alt="Centered Example" className="w-32 h-32" />
-    </div>
+   
+    const handleRatingChange = (newRating: number) => {
+      setRating(newRating);
+    };
+    
+    const handleReviewSubmit = () => {
+      if (!rating || !comment) {
+        return;
+      }
+      const review = {
+        userId : user.id,
+        rating,
+        comment,
+        username: user.username, 
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      
+      dispatch(submitReview({ productId: product?.id, review }));
+      setRating(0);
+      setComment("");
+     
     }
-
+    if(status === Status.Loading){
+      return <div className="flex justify-center items-center h-screen">
+      <img src="/fade-stagger-circles.svg" alt="Centered Example" className="w-32 h-32" />
+  </div>
+  }
+ 
   return (
     
     <>
@@ -173,6 +203,97 @@ const SingleProduct = () => {
         </div>
       </div>
       }
+      <div className="mt-10">
+  <h3 className="text-2xl font-bold mb-4">Customer Reviews</h3>
+
+  {product?.reviews && product.reviews.length > 0 ? (
+    <div className="space-y-6">
+      {product.reviews.map((review, index) => (
+        <div key={index} className="bg-white p-4 rounded shadow">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-semibold">{review.username}</h4>
+            <span className="text-sm text-gray-500">
+              {new Date(review.createdAt).toLocaleDateString()}
+            </span>
+          </div>
+          <div className="flex items-center mb-2">
+            {[...Array(5)].map((_, i) => (
+              <svg
+                key={i}
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill={i < review.rating ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                className={`w-5 h-5 ${i < review.rating ? 'text-yellow-500' : 'text-gray-300'}`}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                />
+              </svg>
+            ))}
+          </div>
+          <p className="text-gray-700">{review.comment}</p>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p className="text-gray-600">No reviews yet.</p>
+  )}
+</div>
+{/* Add a Review Form */}
+<div className="mt-8 bg-white p-6 rounded-lg shadow-md">
+  <h3 className="text-2xl font-bold mb-4">Add Your Review</h3>
+  
+  <div className="mb-4">
+    <label htmlFor="rating" className="block text-gray-700 font-semibold mb-2">Rating</label>
+    <div className="flex space-x-1">
+      {[...Array(5)].map((_, index) => (
+        <svg
+          key={index}
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill={rating >= index + 1 ? "currentColor" : "none"}
+          stroke="currentColor"
+          className="w-8 h-8 cursor-pointer text-yellow-500"
+          onClick={() => handleRatingChange(index + 1)} // On click, set the rating
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+          />
+        </svg>
+      ))}
+    </div>
+  </div>
+
+  <div className="mb-4">
+    <label htmlFor="comment" className="block text-gray-700 font-semibold mb-2">Comment</label>
+    <textarea
+      id="comment"
+      name="comment"
+      rows={4}
+      value={comment}
+      onChange={(e) => setComment(e.target.value)}
+      className="w-full p-3 border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
+      placeholder="Write your review here"
+    />
+  </div>
+
+  <div className="flex items-center justify-end">
+    <button
+      type="button"
+      onClick={handleReviewSubmit}
+      className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      disabled={!rating || !comment} // Disable if no rating or comment
+    >
+      Submit Review
+    </button>
+  </div>
+</div>
+      
     </>
   );
 };

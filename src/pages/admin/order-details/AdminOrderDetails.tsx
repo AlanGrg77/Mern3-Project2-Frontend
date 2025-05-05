@@ -1,41 +1,39 @@
-import { useParams } from "react-router-dom";
-import  {cancelOrderAPI, fetchMyOrderDetails, OrderStatus, updateOrderDetailStatusinSlice } from "../../store/checkoutSlice";
-import { useEffect } from "react";
-// import { OrderStatus } from "./types";
-import { useAppDispatch, useAppSelector } from "../../store/hook";
-import { socket } from "../../App";
+import { useParams } from "react-router-dom"
+import AdminLayout from "../AdminLayout"
+import { ChangeEvent, useEffect, useState } from "react"
+import { fetchAdminOrderDetails } from "../../../store/adminOrderSlice"
+import { socket } from "../../../App"
+import { useAppDispatch, useAppSelector } from "../../../store/hook"
+import { OrderStatus } from "../../../store/checkoutSlice"
 
 
-
-function MyOrderDetail(){
+function AdminOrderDetails(){
     const dispatch = useAppDispatch()
     const {id} = useParams()
-    const {orderDetails}  = useAppSelector((state)=>state.checkout)
-    // const [data] = items.filter((order)=>order.id === id)
-    console.log(orderDetails,"ITEMS")
+    const {orderDetails}  = useAppSelector((state)=>state.adminOrders)
+   
 
     useEffect(()=>{
         if(id){
 
-            dispatch(fetchMyOrderDetails(id))
+            dispatch(fetchAdminOrderDetails(id))
         }
     },[])
 
-    const cancelOrder = ()=>{
-      if(id){
-        dispatch(cancelOrderAPI(id) )
-      }
-    }
-    useEffect(()=>{
-          socket.on("statusUpdated",(data:any)=>{
-            dispatch(updateOrderDetailStatusinSlice(data))
-    
-          })
-          console.log("statusUp")
-        },[socket])
+const handleOrderStatusChange = (e:ChangeEvent<HTMLSelectElement>)=>{
+  
+  if(id){
+    socket.emit("updateOrderStatus",{
+        status : e.target.value, 
+        orderId : id, 
+        userId : orderDetails[0].order.userId
+    },[id,dispatch])
+  }
+
+}
     return(
-        <>
-<div className="py-14 px-4 md:px-6 2xl:px-20 2xl:container 2xl:mx-auto">
+        <AdminLayout>
+            <div className="py-14 px-4 md:px-6 2xl:px-20 2xl:container 2xl:mx-auto">
   <div className="flex justify-start item-start space-y-2 flex-col">
     <h1 className="text-3xl dark:text-white lg:text-4xl font-semibold leading-7 lg:leading-9 text-gray-800">Order #{orderDetails[0]?.orderId}</h1>
     <p className="text-base dark:text-gray-300 font-medium leading-6 text-gray-600">{ new Date(orderDetails[0]?.createdAt).toLocaleDateString()}</p> 
@@ -122,11 +120,27 @@ function MyOrderDetail(){
             </div>
       
           </div>
+          <label htmlFor="">Change Payment status</label>
+                <select name="" id="">
+                    <option value="paid">paid</option>
+                    <option value="unpaid">unpaid</option>
+
+                </select>
           <div className="flex w-full justify-center items-center md:justify-start md:items-start">
            {
             orderDetails[0]?.order?.orderStatus !== OrderStatus?.Cancelled && (
-              <button onClick={cancelOrder} className="mt-6 md:mt-0 dark:border-white dark:hover:bg-gray-900 dark:bg-transparent dark:text-white py-5 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 border border-gray-800 font-medium w-96 2xl:w-full text-base font-medium leading-4 text-gray-800">Cancel Order</button>
-            )
+
+               <>
+                <label htmlFor="">Change Order status</label>
+                <select onChange={handleOrderStatusChange}  name="" id="">
+                    <option value="pending">pending</option>
+                    <option value="delivered">delivered</option>
+                    <option value="ontheway">ontheway</option>
+                    <option value="preparation">preparation</option>
+                    <option value="cancelled">cancelled</option>
+                </select>
+               </>
+                )
            }
           </div>
         </div>
@@ -134,10 +148,8 @@ function MyOrderDetail(){
     </div>
   </div>
 </div>
-
-    
-        </>
+        </AdminLayout>
     )
 }
 
-export default MyOrderDetail
+export default AdminOrderDetails

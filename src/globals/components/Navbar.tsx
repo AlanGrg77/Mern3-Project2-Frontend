@@ -9,6 +9,7 @@ function Navbar(){
     const localStorageToken = localStorage.getItem("userToken")
     const [isLoggedIn,setIsLoggedIn] = useState<boolean>(false)
     const { cartItems } = useAppSelector((state)=>state.cart)
+    const {user} = useAppSelector((state)=>state.auth)
     const dispatch = useAppDispatch()
     useEffect(()=>{
         // setIsLoggedIn(!!localStorageToken || !!reduxToken)
@@ -44,6 +45,9 @@ function Navbar(){
           <div className="px-4">Products</div>
         </Link>
         <Link className="px-4" to="/my-orders">My Orders</Link>
+        {
+          user.role === "admin" && <Link className="px-4" to="/admin">Admin</Link> 
+        }
 
       </div>
       

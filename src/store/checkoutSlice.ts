@@ -45,7 +45,6 @@ export interface IOrderDetail {
   id: string,
   quantity: number,
   createdAt: string,
-
   orderId: string,
   productId: string,
   order: {
@@ -108,7 +107,7 @@ interface IformData {
   total_amount : string,
   transaction_uuid: string
 }
-interface IinitialCState{
+interface IOrder{
     items : IOrderItems[],
     orderDetails : IOrderDetail[],
     khaltiUrl : string | null,
@@ -123,7 +122,7 @@ export enum PaymentMethod{
     Cod = "cod"
 }
 
-const initialState:IinitialCState ={
+const initialState:IOrder={
     items : [],
     orderDetails : [],
     khaltiUrl : null,
@@ -231,7 +230,22 @@ const checkoutSlice = createSlice({
     },
     resetFetchStatus(state){
       state.fetchStatus = null
-  }
+  },
+  updateOrderStatusinSlice(state:IOrder,action:PayloadAction<{status:OrderStatus,userId:string,orderId:string}>){
+    const {status,orderId} = action.payload 
+    const updateOrder = state.items.map((order)=>order.id == orderId  ? {...order,orderStatus : status} : order)
+    console.log(updateOrder,"UO")
+    state.items = updateOrder
+    
+},
+updateOrderDetailStatusinSlice(state:IOrder,action:PayloadAction<{status:OrderStatus,userId:string,orderId:string}>){
+  const {status,orderId} = action.payload 
+  const datas = state.orderDetails.find((order)=>order.orderId === orderId)
+  const updateOrder = datas ? datas.order.orderStatus = status : ""
+  console.log(updateOrder,"UO")
+  // state.orderDetails = updateOrder
+  
+}
     },
     extraReducers(builder) {
         builder
@@ -283,5 +297,5 @@ const checkoutSlice = createSlice({
     },
 })
 
-export const {resetFetchStatus,resetCheckoutStatus} = checkoutSlice.actions
+export const {resetFetchStatus,resetCheckoutStatus,updateOrderStatusinSlice,updateOrderDetailStatusinSlice } = checkoutSlice.actions
 export default checkoutSlice.reducer

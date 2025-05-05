@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IProduct, IProductState } from "../pages/product/types/productType";
+import { IProduct, IProductState, Review } from "../pages/product/types/productType";
 import axios from "axios";
 import { Status } from "../globals/types/authType";
 
@@ -35,6 +35,32 @@ export const fetchSingleProduct = createAsyncThunk<IProduct,string,{rejectValue 
     }
 )
 
+export const submitReview = createAsyncThunk<IProduct,{ productId: string | undefined; review: Review },{rejectValue:string}>(
+    "product/submitReview",
+    async ({ productId, review } ,thunkAPI) => {
+      // Validate productId
+      if (!productId) {
+        throw new Error("Product ID is required");
+      }
+  
+      try {
+        const response = await axios.post(
+          `http://localhost:3000/api/product/${productId}/reviews`,
+          review,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+  
+        return response.data.data; // Assuming response.data contains the updated product or review info
+      } catch (error:any) {
+        return thunkAPI.rejectWithValue(error.response?.data?.message)
+    }
+    }
+  );
+
 const productSlice = createSlice({
     name : 'product',
     initialState,
@@ -63,6 +89,22 @@ const productSlice = createSlice({
             state.product = action.payload
         })
         .addCase(fetchSingleProduct.rejected, (state,action)=>{
+            state.status = Status.Error
+            state.error = action.payload || "Error"
+        })
+        .addCase(submitReview.pending, (state) => {
+            state.status= Status.Loading;
+          })
+          .addCase(submitReview.fulfilled, (state, action) => {
+            state.status = Status.Success ;
+            // Add the updated product to the state
+            const updatedProduct = action.payload;
+            const index = state.products.findIndex((product) => product.id === updatedProduct.id);
+            if (index !== -1) {
+              state.products[index] = updatedProduct;
+            }
+          })
+          .addCase(submitReview.rejected, (state,action)=>{
             state.status = Status.Error
             state.error = action.payload || "Error"
         })

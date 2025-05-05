@@ -7,6 +7,7 @@ import checkoutReducer from "./checkoutSlice"
 import categoryReducer from "./adminCategorySlice."
 import usersReducer from "./adminUsersSlice"
 import adminProductsReducer from "./adminProductSlice"
+import adminOrdersReducer from "./adminOrderSlice"
 
 export const store = configureStore({
     reducer: {
@@ -17,7 +18,8 @@ export const store = configureStore({
         checkout : checkoutReducer,
         category : categoryReducer,
         users : usersReducer,
-        adminProducts : adminProductsReducer
+        adminProducts : adminProductsReducer,
+        adminOrders : adminOrdersReducer
     }
 })
 

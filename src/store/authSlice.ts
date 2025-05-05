@@ -8,9 +8,11 @@ interface ILoginUser{
 }
 
 interface IUser extends ILoginUser{
+    id : string | null,
     username?: string | null,
     confirmPassword ?: string | null
-    token ?: string | null
+    token ?: string | null,
+    role : string | null
 }
 interface IAuthState{
     user : IUser,
@@ -20,11 +22,13 @@ interface IAuthState{
 
 const initialState:IAuthState = {
     user : {
+        id : null,
         username : null,
         password : null,
         confirmPassword : null,
         email : null,
-        token : null
+        token : null,
+        role : null
 
     },
     status : null,
@@ -48,7 +52,7 @@ export const registerUser = createAsyncThunk<IUser,IUser,{rejectValue : string}>
     }
 )
 
-export const loginUser = createAsyncThunk<{token : string, user : {username: string, email: string, password: string}},ILoginUser,{rejectValue : string}>(
+export const loginUser = createAsyncThunk<{token : string, user : IUser},ILoginUser,{rejectValue : string}>(
     "auth/loginUser",
     async (data,thunkAPI)=>{
         try {
@@ -101,6 +105,8 @@ const authSlice = createSlice({
             state.user.username = action.payload.user.username
             state.user.email = action.payload.user.email
             state.user.password = action.payload.user.password
+            state.user.role = action.payload.user.role
+            state.user.id = action.payload.user.id
         })
         .addCase(loginUser.rejected, (state,action)=>{
             state.status = Status.Error,

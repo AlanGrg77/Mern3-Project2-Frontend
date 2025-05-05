@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { fetchMyOrder, resetFetchStatus } from "../../store/checkoutSlice"
+import { fetchMyOrder, updateOrderStatusinSlice } from "../../store/checkoutSlice"
 import { useAppDispatch, useAppSelector } from "../../store/hook"
+import { socket } from "../../App"
 
 
 function MyOrder(){
@@ -15,6 +16,13 @@ function MyOrder(){
     useEffect(()=>{
         dispatch(fetchMyOrder())
     },[])
+    useEffect(()=>{
+      socket.on("statusUpdated",(data:any)=>{
+        dispatch(updateOrderStatusinSlice(data))
+
+      })
+      console.log("statusUp")
+    },[socket])
     return (
         <>
 <div>
